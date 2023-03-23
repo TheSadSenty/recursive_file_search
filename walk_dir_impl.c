@@ -6,6 +6,7 @@
 #include <getopt.h>
 
 #include "functions.h"
+#include "colors.h"
 void walk_dir_impl(char *dir, char *sequence)
 {
     DIR *d = opendir(dir);
@@ -13,10 +14,10 @@ void walk_dir_impl(char *dir, char *sequence)
     {
         if (getenv("LAB11DEBUG") != NULL)
         {
-            printf("Failed to opendir() %s\n", dir);
+            printf(ANSI_COLOR_RED "Failed to opendir() %s" ANSI_COLOR_RESET "\n", dir);
             if (errno == EACCES)
             {
-                fprintf(stderr, "Access denied: %s\n", dir);
+                fprintf(stderr, ANSI_COLOR_RED "Access denied: %s" ANSI_COLOR_RESET "\n", dir);
             }
         }
 
@@ -33,7 +34,7 @@ void walk_dir_impl(char *dir, char *sequence)
             {
                 if (getenv("LAB11DEBUG") != NULL)
                 {
-                    fprintf(stderr, "Failed to read dir: %s\n", dir);
+                    fprintf(stderr, ANSI_COLOR_RED "Failed to read dir: %s" ANSI_COLOR_RESET "\n", dir);
                 }
 
                 continue; // Проблема, переходим к следующему элементу

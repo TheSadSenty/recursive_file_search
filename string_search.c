@@ -4,11 +4,13 @@
 #include <errno.h>
 #include <dirent.h>
 #include <getopt.h>
+
+#include "colors.h"
 void string_search(const char *file_path, char *search_string)
 {
     if (getenv("LAB11DEBUG") != NULL)
     {
-        fprintf(stderr, "Start search in: %s\n", file_path);
+        fprintf(stderr, ANSI_COLOR_CYAN "Start search in: %s" ANSI_COLOR_RESET "\n", file_path);
     }
 
     if (!strcmp(file_path, ".") || !strcmp(file_path, ".."))
@@ -19,10 +21,10 @@ void string_search(const char *file_path, char *search_string)
     {
         if (getenv("LAB11DEBUG") != NULL)
         {
-            fprintf(stderr, "Failed to open file: %s\n", file_path);
+            fprintf(stderr, ANSI_COLOR_RED "Failed to open file: %s" ANSI_COLOR_RESET "\n", file_path);
             if (errno == EACCES)
             {
-                fprintf(stderr, "Access denied: %s\n", file_path);
+                fprintf(stderr, ANSI_COLOR_RED "Access denied: %s" ANSI_COLOR_RESET "\n", file_path);
             }
         }
 
@@ -32,7 +34,7 @@ void string_search(const char *file_path, char *search_string)
     {
         if (getenv("LAB11DEBUG") != NULL)
         {
-            fprintf(stderr, "Successfully open file: %s\n", file_path);
+            fprintf(stderr, ANSI_COLOR_GREEN "Successfully open file: %s" ANSI_COLOR_RESET "\n", file_path);
         }
         size_t search_string_char_size = sizeof(search_string[0]);
         size_t len_search_string = strlen(search_string) + 1; // because fgets read until n-1
@@ -43,7 +45,7 @@ void string_search(const char *file_path, char *search_string)
         {
             if (strcmp(buffer, search_string) == 0)
             {
-                printf("Find one at: %s\n", file_path);
+                printf(ANSI_COLOR_MAGENTA "Find one at: %s" ANSI_COLOR_RESET "\n", file_path);
                 fseek(fp, ++step, SEEK_SET);
             }
             else
