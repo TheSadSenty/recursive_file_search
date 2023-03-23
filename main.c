@@ -20,31 +20,51 @@ int main(int argc, char *argv[])
     return EXIT_SUCCESS;
 }
 
-void string_search(const char *file_path, char* search_string)
+void string_search(const char *file_path, char *search_string)
 {
+    if (getenv("LAB11DEBUG") != NULL)
+    {
+        fprintf(stderr, "Start search in: %s\n", file_path);
+    }
+
     if (!strcmp(file_path, ".") || !strcmp(file_path, ".."))
         return;
 
     FILE *fp = fopen(file_path, "r");
+    if (fp == NULL)
+    {
+        if (getenv("LAB11DEBUG") != NULL)
+        {
+            fprintf(stderr, "Failed to open file: %s\n", file_path);
+            if (errno == EACCES)
+            {
+                fprintf(stderr, "Access denied: %s\n", file_path);
+            }
+        }
 
-    size_t search_string_char_size=sizeof(search_string[0]);
-    size_t len_search_string = strlen(search_string)+1;//because fgets read until n-1
-
-    char *buffer = calloc(len_search_string,search_string_char_size); 
-    //printf("%ld \n", search_string_char_size);
-    //printf("%ld \n", len_search_string);
-    int step=0;
+        return;
+    }
     if (fp)
     {
+        if (getenv("LAB11DEBUG") != NULL)
+        {
+            fprintf(stderr, "Successfully open file: %s\n", file_path);
+        }
+        size_t search_string_char_size = sizeof(search_string[0]);
+        size_t len_search_string = strlen(search_string) + 1; // because fgets read until n-1
+
+        char *buffer = calloc(len_search_string, search_string_char_size);
+        int step = 0;
         while (fgets(buffer, len_search_string, fp) != NULL)
         {
-            //printf("%s|%s \n",file_path,buffer);
-            if(strcmp(buffer, search_string)==0){
-                printf("%s \n", "Find one");
-                fseek(fp,++step,SEEK_SET);
+            if (strcmp(buffer, search_string) == 0)
+            {
+                printf("Find one at: %s\n", file_path);
+                fseek(fp, ++step, SEEK_SET);
             }
-            else{
-                fseek(fp,++step,SEEK_SET);
+            else
+            {
+                fseek(fp, ++step, SEEK_SET);
             }
         }
     }
@@ -55,7 +75,15 @@ void walk_dir_impl(char *dir, char *sequence)
     DIR *d = opendir(dir);
     if (d == NULL)
     {
-        printf("Failed to opendir() %s\n", dir);
+        if (getenv("LAB11DEBUG") != NULL)
+        {
+            printf("Failed to opendir() %s\n", dir);
+            if (errno == EACCES)
+            {
+                fprintf(stderr, "Access denied: %s\n", dir);
+            }
+        }
+
         return;
     }
 
@@ -66,7 +94,15 @@ void walk_dir_impl(char *dir, char *sequence)
         if (p == NULL)
         {
             if (errno != 0)
+            {
+                if (getenv("LAB11DEBUG") != NULL)
+                {
+                    fprintf(stderr, "Failed to read dir: %s\n", dir);
+                }
+
                 continue; // Проблема, переходим к следующему элементу
+            }
+
             else
                 break; // В каталоге больше ничего нет
         }
@@ -74,9 +110,12 @@ void walk_dir_impl(char *dir, char *sequence)
         if (strcmp(p->d_name, ".") && strcmp(p->d_name, ".."))
         {
 
-            char file_path[PATH_MAX] = {0}; // construct path to files
-            sprintf(file_path, "%s/%s", dir, p->d_name);
-            string_search(file_path,sequence);
+            if (p->d_type == DT_REG)
+            {
+                char file_path[PATH_MAX] = {0}; // construct path to files
+                sprintf(file_path, "%s/%s", dir, p->d_name);
+                string_search(file_path, sequence);
+            }
 
             if (p->d_type == DT_DIR)
             {
