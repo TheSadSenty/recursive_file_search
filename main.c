@@ -2,10 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
-#include <sys/types.h>
-#include <sys/param.h> // for MIN()
 #include <dirent.h>
-#include <memory.h>
 #include <getopt.h>
 
 void walk_dir_impl(char *, char *);
@@ -63,7 +60,10 @@ void string_search(const char *file_path, char *search_string)
                 fseek(fp, ++step, SEEK_SET);
             }
         }
+        free(buffer);
+        buffer = NULL;
     }
+    fclose(fp);
 }
 
 void walk_dir_impl(char *dir, char *sequence)
