@@ -17,7 +17,7 @@ void argument_parser(int argc, char *argv[])
     {
         switch (choice)
         {
-        case 0:
+        case 0://if choice 0 or h - print help
 
         case 'h':
             printf("Usage: %s <dir> <string>\n", argv[0]);
@@ -26,7 +26,7 @@ void argument_parser(int argc, char *argv[])
             exit(EXIT_SUCCESS);
         case 1:
 
-        case 'v':
+        case 'v'://if choice 1 or v - print version
             printf("Kasyanov Maxim\nN32451\nVariant 2\n");
             exit(EXIT_SUCCESS);
         case '?':

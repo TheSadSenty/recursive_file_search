@@ -9,7 +9,7 @@
 #include "colors.h"
 void walk_dir_impl(char *dir, char *sequence)
 {
-    DIR *d = opendir(dir);
+    DIR *d = opendir(dir);//try to open dir
     if (d == NULL)
     {
         if (getenv("LAB11DEBUG") != NULL)
@@ -37,24 +37,24 @@ void walk_dir_impl(char *dir, char *sequence)
                     fprintf(stderr, ANSI_COLOR_RED "Failed to read dir: %s" ANSI_COLOR_RESET "\n", dir);
                 }
 
-                continue; // Проблема, переходим к следующему элементу
+                continue; // issue, go to next element
             }
 
             else
-                break; // В каталоге больше ничего нет
+                break; // There is nothing else in the catalog
         }
 
         if (strcmp(p->d_name, ".") && strcmp(p->d_name, ".."))
         {
 
-            if (p->d_type == DT_REG)
+            if (p->d_type == DT_REG)// if it's a regular file start search
             {
                 char file_path[PATH_MAX] = {0}; // construct path to files
                 sprintf(file_path, "%s/%s", dir, p->d_name);
                 string_search(file_path, sequence);
             }
 
-            if (p->d_type == DT_DIR)
+            if (p->d_type == DT_DIR)//if it's a directory start run functhion again
             {
                 char buf[PATH_MAX] = {0};
                 sprintf(buf, "%s/%s", dir, p->d_name);
