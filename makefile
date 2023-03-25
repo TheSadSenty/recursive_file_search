@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror
 OUTPUT = labmksN32451.out
-.PHONY: clean,all,build, debug
+.PHONY: clean,all,build, debug, tar
 all: build
 
 build: main.o string_search.o walk_dir_impl.o argument_parser.o
@@ -21,6 +21,7 @@ walk_dir_impl.o: walk_dir_impl.c string_search.o
 
 argument_parser.o: argument_parser.c
 	$(CC) $(CFLAGS) -c $<
-
+tar:
+	tar --create --file archive.tar *.c *.txt *.h makefile
 clean:
 	rm -rf *.o
