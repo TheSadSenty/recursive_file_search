@@ -7,7 +7,7 @@
 
 #include "functions.h"
 #include "colors.h"
-void walk_dir_impl(char *dir, char *sequence)
+void walk_dir_impl(char *dir)
 {
     DIR *d = opendir(dir);//try to open dir
     if (d == NULL)
@@ -47,18 +47,27 @@ void walk_dir_impl(char *dir, char *sequence)
         if (strcmp(p->d_name, ".") && strcmp(p->d_name, ".."))
         {
 
-            if (p->d_type == DT_REG)// if it's a regular file start search
+            if (p->d_type == DT_REG) // if it's a regular file start search
             {
-                char file_path[PATH_MAX] = {0}; // construct path to files
-                sprintf(file_path, "%s/%s", dir, p->d_name);
-                string_search(file_path, sequence);
+                char *extension;
+                extension = memchr(p->d_name, '.', strlen(p->d_name));
+
+                if (strcmp(extension, ".so") == 0)
+                {
+                    char file_path[PATH_MAX] = {0}; // construct path to files
+                    sprintf(file_path, "%s/%s", dir, p->d_name);
+                    validate_plugin(file_path);
+                }
+                else{
+                    printf("Regular file\n");
+                }
             }
 
-            if (p->d_type == DT_DIR)//if it's a directory start run functhion again
+            if (p->d_type == DT_DIR) // if it's a directory start run functhion again
             {
                 char buf[PATH_MAX] = {0};
                 sprintf(buf, "%s/%s", dir, p->d_name);
-                walk_dir_impl(buf, sequence);
+                walk_dir_impl(buf);
             }
         }
     }

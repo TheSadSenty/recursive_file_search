@@ -13,7 +13,7 @@ void argument_parser(int argc, char *argv[])
         {"version", no_argument, 0, 1}};
     int option_index = 0;
     int choice;
-    while ((choice = getopt_long(argc, argv, "vh", long_options, &option_index)) != -1)
+    while ((choice = getopt_long(argc, argv, "vhP:", long_options, &option_index)) != -1)
     {
         switch (choice)
         {
@@ -36,12 +36,11 @@ void argument_parser(int argc, char *argv[])
         case 'v'://if choice 1 or v - print version
             printf("Kasyanov Maxim\nN32451\nVariant 13\n");
             exit(EXIT_SUCCESS);
+        case 'P':
+            walk_dir_impl(argv[2]);
+            break;
         case '?':
             exit(EXIT_FAILURE);
         }
-    }
-    if (argc == 3)
-    {
-        walk_dir_impl(argv[1], argv[2]);
     }
 }
