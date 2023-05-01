@@ -1,6 +1,7 @@
 #include <stdio.h>
-#include "plugin_api.h"
+#include <stddef.h>
 #include <dlfcn.h>
+#include "plugin_api.h"
 /*
 Validate plugin by calling plugin_get_info()
 return:

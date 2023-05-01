@@ -1,7 +1,8 @@
 #ifndef _PLUGIN_API_H
 #define _PLUGIN_API_H
-#include <stddef.h>
+
 #include <getopt.h>
+
 
 #define PLUGIN_API_VERSION  1
 
