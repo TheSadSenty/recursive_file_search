@@ -7,9 +7,23 @@
 
 #include "functions.h"
 #include "colors.h"
+
+void walk_dir_impl(char *dir);
+static char *dlls_path;
+/*
+Search for .so in dir
+return:
+    Path to all found .so separated by ":"
+*/
+char *seach_so(char *dir)
+{
+    walk_dir_impl(dir);
+    return dlls_path;
+}
+
 void walk_dir_impl(char *dir)
 {
-    DIR *d = opendir(dir);//try to open dir
+    DIR *d = opendir(dir); // try to open dir
     if (d == NULL)
     {
         if (getenv("LAB11DEBUG") != NULL)
@@ -49,16 +63,33 @@ void walk_dir_impl(char *dir)
 
             if (p->d_type == DT_REG) // if it's a regular file start search
             {
+                char file_path[PATH_MAX] = {0}; // construct path to files
+                sprintf(file_path, "%s/%s", dir, p->d_name);
+
                 char *extension;
                 extension = memchr(p->d_name, '.', strlen(p->d_name));
-
+                // Process .so files
                 if (strcmp(extension, ".so") == 0)
                 {
-                    char file_path[PATH_MAX] = {0}; // construct path to files
-                    sprintf(file_path, "%s/%s", dir, p->d_name);
-                    validate_plugin(file_path);
+                    if (validate_plugin(file_path) == 0)
+                    {
+                        if (!dlls_path)
+                        {
+                            //for the first time
+                            dlls_path = calloc(strlen(file_path), sizeof(file_path) + 1);
+                            sprintf(dlls_path, "%s", file_path);
+                        }
+                        else
+                        {
+                            //for the other times
+                            dlls_path = realloc(dlls_path, strlen(dlls_path) + 1 + sizeof(file_path) + 1);
+                            strcat(dlls_path, ":");
+                            strcat(dlls_path, file_path);
+                        }
+                    }
                 }
-                else{
+                else
+                {
                     printf("Regular file\n");
                 }
             }
@@ -71,6 +102,5 @@ void walk_dir_impl(char *dir)
             }
         }
     }
-
     closedir(d);
 }

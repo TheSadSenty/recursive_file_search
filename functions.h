@@ -1,5 +1,5 @@
 #pragma once
-void walk_dir_impl(char *dir);
+char *seach_so(char *dir);
 void argument_parser(int, char **);
 void string_search(const char *, char *);
-void validate_plugin(char* plugin_path);
+int validate_plugin(char *plugin_path);

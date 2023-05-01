@@ -1,7 +1,13 @@
 #include <stdio.h>
 #include "plugin_api.h"
 #include <dlfcn.h>
-void validate_plugin(char *plugin_path)
+/*
+Validate plugin by calling plugin_get_info()
+return:
+    0 - if all OK
+    1 - if something wrong
+ */
+int validate_plugin(char *plugin_path)
 {
     // init special struct
     printf("%s\n", plugin_path);
@@ -42,7 +48,9 @@ void validate_plugin(char *plugin_path)
             fprintf(stdout, "\t--%s\t\t%s\n", pi.sup_opts[i].opt.name, pi.sup_opts[i].opt_descr);
         }
     }
+    return 0;
 END:
     if (dl)
         dlclose(dl);
+    return 1;
 }

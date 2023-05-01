@@ -8,6 +8,7 @@
 #include "functions.h"
 void argument_parser(int argc, char *argv[])
 {
+    static char *path_so;
     if ((argc == 1) || ((strncmp(argv[1], "-h", sizeof("-h"))) == 0 && (argc == 2)))
     {
         /* Print help */
@@ -32,7 +33,8 @@ void argument_parser(int argc, char *argv[])
     if (strncmp(argv[1], "-P", sizeof("-P")) == 0)
     {
         /* Start search for .so files in directory */
-        walk_dir_impl(argv[2]);
+        /* Get path to all .so in dir */
+        path_so = seach_so(argv[2]);
     }
     else
     {
@@ -40,4 +42,5 @@ void argument_parser(int argc, char *argv[])
         printf("%s: Unrecognized options\n", argv[0]);
         exit(EXIT_FAILURE);
     }
+    printf(".so: %s\n",path_so);
 }
