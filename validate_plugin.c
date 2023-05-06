@@ -49,6 +49,8 @@ int validate_plugin(char *plugin_path)
             fprintf(stdout, "\t--%s\t\t%s\n", pi.sup_opts[i].opt.name, pi.sup_opts[i].opt_descr);
         }
     }
+    if (dl)
+        dlclose(dl);
     return 0;
 END:
     if (dl)
