@@ -118,11 +118,24 @@ void parse_plugins_parameters(int argc, char *argv[], char *path_to_so)
                             char *save_res;
                             char *param = __strtok_r(copy_argv, "=", &save_res);
                             char *value = __strtok_r(NULL, "=", &save_res);
+                            if (value == NULL)
+                            {
+                                printf("Options %s require value. Got nothing instead\n", param);
+                                exit(EXIT_FAILURE);
+                            }
                             printf("parse_plugins_parameters:%s=%s\n", param, value);
                         }
                         else
                         {
-                            printf("parse_plugins_parameters:%s=%s\n", argv[opt], argv[opt+1]);
+                            if (argv[opt + 1] == NULL)
+                            {
+                                printf("Options %s require value. Got nothing instead\n", argv[opt]);
+                                exit(EXIT_FAILURE);
+                            }
+                            if (((argv[opt + 1][0] == '-') && (argv[opt + 1][1] == '-')))
+                            {
+                            }
+                            printf("parse_plugins_parameters:%s=%s\n", argv[opt], argv[opt + 1]);
                         }
                     }
                 }
