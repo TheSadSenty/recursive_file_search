@@ -42,5 +42,6 @@ void argument_parser(int argc, char *argv[])
         printf("%s: Unrecognized options\n", argv[0]);
         exit(EXIT_FAILURE);
     }
-    printf(".so: %s\n",path_so);
+    printf(".so: %s\n", path_so);
+    parse_plugins_parameters(argc, argv, path_so);
 }
