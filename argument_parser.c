@@ -43,5 +43,26 @@ void argument_parser(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
     printf(".so: %s\n", path_so);
-    parse_plugins_parameters(argc, argv, path_so);
+    static struct option *detected_opt;   // struct for plugin_process_file()
+    static size_t *plugins_options_count; // array of detected options for each plugin
+    int plugin_count = 0;
+    int detected_option_count = 0;
+
+    plugin_count = parse_plugins_parameters(argc, argv, path_so, &detected_opt, &plugins_options_count);
+
+    for (int i; i < plugin_count; i++)
+    {
+        detected_option_count=detected_option_count+plugins_options_count[i];
+    }
+    printf("detected_option_count:%d\n", detected_option_count);
+    for (int i = 0; i < detected_option_count; i++)
+    {
+        printf("struct:%s\n", detected_opt[i].name);
+    }
+    for (int i = 0; i < plugin_count; i++)
+    {
+        printf("plugin_opt:%ld\n", plugins_options_count[i]);
+    }
+    free(plugins_options_count);
+    free(detected_opt);
 }

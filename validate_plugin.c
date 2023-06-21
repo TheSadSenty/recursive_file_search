@@ -61,23 +61,35 @@ END:
         dlclose(dl);
     return 1;
 }
-void parse_plugins_parameters(int argc, char *argv[], char *path_to_so)
+/*
+    Function to fill a struct option with option names and values.
+    Also checks for extra opthions and missing opthions.
+    Function returns plugin count
+    Params:
+        int argc
+        char *argv[]
+        char *path_to_so - string "path_to_so_1:path_to_so_2..."
+        struct option **detected_opt - struct to fill with plug options and values
+        size_t **plugins_options_count - array. len=plugin count. Each element is thecount of detected options for each plugin.
+    Return:
+        int plugin_count
+*/
+int parse_plugins_parameters(int argc, char *argv[], char *path_to_so, struct option **detected_opt, size_t **plugins_options_count)
 {
-    char *pch = strtok(path_to_so, ":");
 
+    char *pch = strtok(path_to_so, ":");
     int plugin_count = 0;
-    static struct option *detected_opt;   // struct for plugin_process_file()
-    static size_t *plugins_options_count; // array of detected options for each plugin
-    int detected_option_count = 0;        // all detected options
+
+    int detected_option_count = 0; // all detected options
     while (pch != NULL)
     {
-        if (plugins_options_count == NULL)
+        if ((*plugins_options_count) == NULL)
         {
-            plugins_options_count = malloc(sizeof(size_t));
+            (*plugins_options_count) = malloc(sizeof(size_t));
         }
         else
         {
-            plugins_options_count = realloc(plugins_options_count, (plugin_count + 1) * sizeof(size_t));
+            (*plugins_options_count) = realloc(*plugins_options_count, (plugin_count + 1) * sizeof(size_t));
         }
 
         struct plugin_info pi = {0};
@@ -105,7 +117,7 @@ void parse_plugins_parameters(int argc, char *argv[], char *path_to_so)
             fprintf(stderr, "ERROR: plugin_get_info() failed\n");
             goto END;
         }
-        plugins_options_count[plugin_count] = 0;
+        (*plugins_options_count)[plugin_count] = 0;
         for (size_t i = 0; i < pi.sup_opts_len; i++)
         {
             // printf("fill_options:%s\n", pi.sup_opts[i].opt.name);
@@ -120,7 +132,7 @@ void parse_plugins_parameters(int argc, char *argv[], char *path_to_so)
 
                 if (strncmp(buff, argv[opt], strlen(pi.sup_opts[i].opt.name) + 2) == 0)
                 {
-                    plugins_options_count[plugin_count] = plugins_options_count[plugin_count] + 1;
+                    (*plugins_options_count)[plugin_count] = (*plugins_options_count)[plugin_count] + 1;
                     if (pi.sup_opts[i].opt.has_arg == required_argument)
                     {
 
@@ -134,6 +146,7 @@ void parse_plugins_parameters(int argc, char *argv[], char *path_to_so)
                             char *save_res;
                             char *param = __strtok_r(copy_argv, "=", &save_res);
                             char *value = __strtok_r(NULL, "=", &save_res);
+                            //
                             if (value == NULL)
                             {
                                 printf("Options %s require value. Got nothing instead\n", param);
@@ -144,21 +157,23 @@ void parse_plugins_parameters(int argc, char *argv[], char *path_to_so)
                             // for "param=value" format
                             // fill struct with data
                             // What do you think about Italy?
-                            if (detected_opt == NULL)
+                            if ((*detected_opt) == NULL)
                             {
-                                detected_opt = malloc(sizeof(struct option *));
+                                *detected_opt = malloc(sizeof(struct option *));
                             }
                             else
                             {
-                                detected_opt = realloc(detected_opt, (detected_option_count + 1) * sizeof(struct option));
+                                *detected_opt = realloc(*detected_opt, (detected_option_count + 1) * sizeof(struct option));
                             }
-                            detected_opt[detected_option_count].name = malloc(sizeof(param_name));
-                            detected_opt[detected_option_count].name = param_name;
+                            (*detected_opt)[detected_option_count].name = malloc(sizeof(param_name));
+                            (*detected_opt)[detected_option_count].name = param_name;
 
-                            detected_opt[detected_option_count].has_arg = 1;
+                            (*detected_opt)[detected_option_count].has_arg = 1;
 
-                            detected_opt[detected_option_count].flag = malloc(sizeof(value));
-                            detected_opt[detected_option_count].flag = (int *)value;
+                            (*detected_opt)[detected_option_count].flag = malloc(sizeof(value));
+                            (*detected_opt)[detected_option_count].flag = (int *)value;
+
+                            //free(copy_argv);
                         }
                         else
                         {
@@ -174,21 +189,21 @@ void parse_plugins_parameters(int argc, char *argv[], char *path_to_so)
                             // add all plug opt to list to compare them after
                             // for "param value" format
                             // What do you think about Italy? x2
-                            if (detected_opt == NULL)
+                            if ((*detected_opt)== NULL)
                             {
-                                detected_opt = malloc(sizeof(struct option *));
+                                (*detected_opt) = malloc(sizeof(struct option *));
                             }
                             else
                             {
-                                detected_opt = realloc(detected_opt, (detected_option_count + 1) * sizeof(struct option));
+                                (*detected_opt) = realloc(*detected_opt, (detected_option_count + 1) * sizeof(struct option));
                             }
-                            detected_opt[detected_option_count].name = malloc(sizeof(param_name));
-                            detected_opt[detected_option_count].name = param_name;
+                            (*detected_opt)[detected_option_count].name = malloc(sizeof(param_name));
+                            (*detected_opt)[detected_option_count].name = param_name;
 
-                            detected_opt[detected_option_count].has_arg = 1;
+                            (*detected_opt)[detected_option_count].has_arg = 1;
 
-                            detected_opt[detected_option_count].flag = malloc(sizeof(argv[opt + 1]));
-                            detected_opt[detected_option_count].flag = (int *)argv[opt + 1];
+                            (*detected_opt)[detected_option_count].flag = malloc(sizeof(argv[opt + 1]));
+                            (*detected_opt)[detected_option_count].flag = (int *)argv[opt + 1];
                         }
                     }
                     else
@@ -196,23 +211,25 @@ void parse_plugins_parameters(int argc, char *argv[], char *path_to_so)
                         // add all plug opt to list to compare them after
                         // for param only format
                         ////What do you think about Italy?X3
-                        if (detected_opt == NULL)
+                        if ((*detected_opt) == NULL)
                         {
-                            detected_opt = malloc(sizeof(struct option *));
+                            (*detected_opt) = malloc(sizeof(struct option *));
                         }
                         else
                         {
-                            detected_opt = realloc(detected_opt, (detected_option_count + 1) * sizeof(struct option));
+                            (*detected_opt) = realloc(*detected_opt, (detected_option_count + 1) * sizeof(struct option));
                         }
-                        detected_opt[detected_option_count].name = malloc(sizeof(param_name));
-                        detected_opt[detected_option_count].name = param_name;
+                        (*detected_opt)[detected_option_count].name = malloc(sizeof(param_name));
+                        (*detected_opt)[detected_option_count].name = param_name;
 
-                        detected_opt[detected_option_count].has_arg = 0;
+                        (*detected_opt)[detected_option_count].has_arg = 0;
                     }
                     // increment only if a valid argument
                     detected_option_count = detected_option_count + 1;
                 }
             }
+            //free(buff);
+            //free(param_name);
         }
         if (dl)
             dlclose(dl);
@@ -223,33 +240,25 @@ void parse_plugins_parameters(int argc, char *argv[], char *path_to_so)
 
         plugin_count = plugin_count + 1;
     }
-    if (detected_opt == NULL)
+    if ((*detected_opt) == NULL)
     {
-        detected_opt = malloc(sizeof(struct option *));
+        (*detected_opt) = malloc(sizeof(struct option *));
     }
     else
     {
-        detected_opt = realloc(detected_opt, (detected_option_count + 1) * sizeof(struct option));
+        (*detected_opt) = realloc(*detected_opt, (detected_option_count + 1) * sizeof(struct option));
     }
 
-    detected_opt[detected_option_count].name = NULL;
-    detected_opt[detected_option_count].has_arg = 0;
-    detected_opt->flag = NULL;
-    detected_opt[detected_option_count].val = 0;
+    (*detected_opt)[detected_option_count].name = NULL;
+    (*detected_opt)[detected_option_count].has_arg = 0;
+    (*detected_opt)->flag = NULL;
+    (*detected_opt)[detected_option_count].val = 0;
 
-    printf("detected_option_count:%d\n", detected_option_count);
-    for (int i = 0; i < detected_option_count; i++)
-    {
-        printf("struct:%s\n", detected_opt[i].name);
-    }
-    for (int i = 0; i < plugin_count; i++)
-    {
-        printf("plugin_opt:%ld\n", plugins_options_count[i]);
-    }
+
     // for getopt_long()
     int choice;
     int option_index = 0;
-    while ((choice = getopt_long(argc, argv, "PAON", detected_opt, &option_index)) != -1)
+    while ((choice = getopt_long(argc, argv, "PAON", *detected_opt, &option_index)) != -1)
     {
         switch (choice)
         {
@@ -257,4 +266,5 @@ void parse_plugins_parameters(int argc, char *argv[], char *path_to_so)
             exit(EXIT_FAILURE);
         }
     }
+    return plugin_count;
 }

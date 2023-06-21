@@ -10,4 +10,4 @@ char *seach_so(char *dir);
 void argument_parser(int, char **);
 void string_search(const char *, char *);
 int validate_plugin(char *plugin_path);
-void parse_plugins_parameters(int argc, char *argv[], char *path_to_so);
+int parse_plugins_parameters(int argc, char *argv[], char *path_to_so, struct option **detected_opt, size_t **plugins_options_count);
