@@ -166,7 +166,7 @@ int parse_plugins_parameters(int argc, char *argv[], char *path_to_so, struct op
                                 *detected_opt = realloc(*detected_opt, (detected_option_count + 1) * sizeof(struct option));
                             }
                             (*detected_opt)[detected_option_count].name = malloc(sizeof(param_name));
-                            (*detected_opt)[detected_option_count].name = param_name;
+                            sprintf((char *)(*detected_opt)[detected_option_count].name, "%s", param_name);
 
                             (*detected_opt)[detected_option_count].has_arg = 1;
 
@@ -197,7 +197,7 @@ int parse_plugins_parameters(int argc, char *argv[], char *path_to_so, struct op
                                 (*detected_opt) = realloc(*detected_opt, (detected_option_count + 1) * sizeof(struct option));
                             }
                             (*detected_opt)[detected_option_count].name = malloc(sizeof(param_name));
-                            (*detected_opt)[detected_option_count].name = param_name;
+                            sprintf((char *)(*detected_opt)[detected_option_count].name, "%s", param_name);
 
                             (*detected_opt)[detected_option_count].has_arg = 1;
 
@@ -219,7 +219,7 @@ int parse_plugins_parameters(int argc, char *argv[], char *path_to_so, struct op
                             (*detected_opt) = realloc(*detected_opt, (detected_option_count + 1) * sizeof(struct option));
                         }
                         (*detected_opt)[detected_option_count].name = malloc(sizeof(param_name));
-                        (*detected_opt)[detected_option_count].name = param_name;
+                        sprintf((char *)(*detected_opt)[detected_option_count].name, "%s", param_name);
 
                         (*detected_opt)[detected_option_count].has_arg = 0;
                     }
@@ -227,6 +227,7 @@ int parse_plugins_parameters(int argc, char *argv[], char *path_to_so, struct op
                     detected_option_count = detected_option_count + 1;
                 }
             }
+            free(param_name);
             free(buff);
         }
         if (dl)
