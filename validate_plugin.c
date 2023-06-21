@@ -266,3 +266,23 @@ int parse_plugins_parameters(int argc, char *argv[], char *path_to_so, struct op
     }
     return plugin_count;
 }
+struct option *slice_option_struct(struct option **detected_opt, size_t from, size_t to)
+{
+    if (from >= to)
+    {
+        fprintf(stderr,"Wrong values for from and to");
+        exit(EXIT_FAILURE);
+    }
+    struct option *sliced_opt = malloc(sizeof(struct option) * (to - from));
+    for (size_t i = from; i < to; i++)
+    {
+        sliced_opt[i].name = malloc(sizeof((*detected_opt)[i].name));
+        sprintf((char *)sliced_opt[i].name, "%s", (*detected_opt)[i].name);
+
+        sliced_opt[i].has_arg = (*detected_opt)[i].has_arg;
+
+        sliced_opt[i].flag = malloc(sizeof((*detected_opt)[i].flag));
+        sliced_opt[i].flag = (*detected_opt)[i].flag;
+    }
+    return sliced_opt;
+}
