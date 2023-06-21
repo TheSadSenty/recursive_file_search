@@ -159,7 +159,7 @@ int parse_plugins_parameters(int argc, char *argv[], char *path_to_so, struct op
                             // What do you think about Italy?
                             if ((*detected_opt) == NULL)
                             {
-                                *detected_opt = malloc(sizeof(struct option *));
+                                *detected_opt = malloc(sizeof(struct option));
                             }
                             else
                             {
@@ -172,8 +172,7 @@ int parse_plugins_parameters(int argc, char *argv[], char *path_to_so, struct op
 
                             (*detected_opt)[detected_option_count].flag = malloc(sizeof(value));
                             (*detected_opt)[detected_option_count].flag = (int *)value;
-
-                            //free(copy_argv);
+                            free(copy_argv);
                         }
                         else
                         {
@@ -189,9 +188,9 @@ int parse_plugins_parameters(int argc, char *argv[], char *path_to_so, struct op
                             // add all plug opt to list to compare them after
                             // for "param value" format
                             // What do you think about Italy? x2
-                            if ((*detected_opt)== NULL)
+                            if ((*detected_opt) == NULL)
                             {
-                                (*detected_opt) = malloc(sizeof(struct option *));
+                                (*detected_opt) = malloc(sizeof(struct option));
                             }
                             else
                             {
@@ -213,7 +212,7 @@ int parse_plugins_parameters(int argc, char *argv[], char *path_to_so, struct op
                         ////What do you think about Italy?X3
                         if ((*detected_opt) == NULL)
                         {
-                            (*detected_opt) = malloc(sizeof(struct option *));
+                            (*detected_opt) = malloc(sizeof(struct option));
                         }
                         else
                         {
@@ -228,8 +227,7 @@ int parse_plugins_parameters(int argc, char *argv[], char *path_to_so, struct op
                     detected_option_count = detected_option_count + 1;
                 }
             }
-            //free(buff);
-            //free(param_name);
+            free(buff);
         }
         if (dl)
             dlclose(dl);
@@ -242,7 +240,7 @@ int parse_plugins_parameters(int argc, char *argv[], char *path_to_so, struct op
     }
     if ((*detected_opt) == NULL)
     {
-        (*detected_opt) = malloc(sizeof(struct option *));
+        (*detected_opt) = malloc(sizeof(struct option));
     }
     else
     {
@@ -253,7 +251,6 @@ int parse_plugins_parameters(int argc, char *argv[], char *path_to_so, struct op
     (*detected_opt)[detected_option_count].has_arg = 0;
     (*detected_opt)->flag = NULL;
     (*detected_opt)[detected_option_count].val = 0;
-
 
     // for getopt_long()
     int choice;
