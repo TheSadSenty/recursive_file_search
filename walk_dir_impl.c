@@ -133,7 +133,8 @@ void seach_plugins_fill_struct(char *dir)
                     sprintf((char *)plugins_options[option_count].name, "%s", pi.sup_opts[i].opt.name);
 
                     plugins_options[option_count].has_arg = pi.sup_opts[i].opt.has_arg;
-
+                    
+                    plugins_options[option_count].flag = NULL; 
                     // use an unused field to store the plugin number.
                     plugins_options[option_count].val = plugin_count;
 
