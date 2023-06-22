@@ -6,11 +6,14 @@ struct plugin_path_and_opt
     const char *so_path;
     const char *so_opt;
 };
-void seach_plugins(char *dir);
+void seach_plugins_fill_struct(char *dir);
 /*Global variavles*/
 extern char **array_dlls_path;
 extern int plugin_count;
 extern int is_debug;
+extern struct option *plugins_options;
+extern int option_count;
+
 void argument_parser(int, char **);
 void string_search(const char *, char *);
 int validate_plugin(char *plugin_path);

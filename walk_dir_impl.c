@@ -10,11 +10,13 @@
 
 char **array_dlls_path; // array of strings with dlls path
 int plugin_count;       // number of plugins
+struct option *plugins_options;
+int option_count = 0;
 /*
 Search for .so in dir.
 Functhion allocates an array of strings and increments plugin_count.
 */
-void seach_plugins(char *dir)
+void seach_plugins_fill_struct(char *dir)
 {
     DIR *d = opendir(dir); // try to open dir
     if (d == NULL)
@@ -116,6 +118,28 @@ void seach_plugins(char *dir)
                 }
                 array_dlls_path[plugin_count] = malloc(sizeof(file_path));
                 sprintf(array_dlls_path[plugin_count], "%s", file_path);
+
+                for (size_t i = 0; i < pi.sup_opts_len; i++)
+                {
+                    if (plugins_options == NULL)
+                    {
+                        plugins_options = malloc(sizeof(struct option));
+                    }
+                    else
+                    {
+                        plugins_options = realloc(plugins_options, (option_count + 1) * sizeof(struct option));
+                    }
+                    plugins_options[option_count].name = malloc(sizeof(pi.sup_opts[i].opt.name));
+                    sprintf((char *)plugins_options[option_count].name, "%s", pi.sup_opts[i].opt.name);
+
+                    plugins_options[option_count].has_arg = pi.sup_opts[i].opt.has_arg;
+
+                    // use an unused field to store the plugin number.
+                    plugins_options[option_count].val = plugin_count;
+
+                    option_count = option_count + 1;
+                }
+
                 plugin_count = plugin_count + 1;
             END:
                 if (dl)
@@ -126,7 +150,7 @@ void seach_plugins(char *dir)
             {
                 char buf[PATH_MAX] = {0};
                 sprintf(buf, "%s/%s", dir, p->d_name);
-                seach_plugins(buf);
+                seach_plugins_fill_struct(buf);
             }
         }
     }
