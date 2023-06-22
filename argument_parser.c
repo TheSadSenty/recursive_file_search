@@ -14,6 +14,12 @@ size_t *actual_options_count;
 void argument_parser(int argc, char *argv[])
 {
     actual_options_count = malloc(plugin_count * sizeof(size_t));
+    // init array with zeros
+    for (int i = 0; i < plugin_count; i++)
+    {
+        actual_options_count[i] = 0;
+    }
+
     int option_index;
     int rez;
     while ((rez = getopt_long(argc, argv, "P:AONhv", plugins_options, &option_index)) != -1)
@@ -87,6 +93,10 @@ void argument_parser(int argc, char *argv[])
         for (int i = 0; i < option_count; i++)
         {
             printf(ANSI_COLOR_CYAN "After getopt_long():\n\topt_name:%s\n\thas_arg:%d\n\topt_value:%s\n" ANSI_COLOR_RESET, plugins_options[i].name, plugins_options[i].has_arg, (char *)plugins_options[i].flag);
+        }
+        for (int i = 0; i < plugin_count; i++)
+        {
+            printf(ANSI_COLOR_GREEN "detected options for %s:\t%ld\n" ANSI_COLOR_RESET, array_dlls_path[i], actual_options_count[i]);
         }
     }
 }
