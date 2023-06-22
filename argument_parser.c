@@ -34,7 +34,7 @@ void argument_parser(int argc, char *argv[])
     {
         /* Start search for .so files in directory */
         /* Get path to all .so in dir */
-        path_so = seach_so(argv[2]);
+        //path_so = seach_so(argv[2]);
     }
     else
     {

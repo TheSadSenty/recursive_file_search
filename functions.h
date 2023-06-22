@@ -6,7 +6,9 @@ struct plugin_path_and_opt
     const char *so_path;
     const char *so_opt;
 };
-char *seach_so(char *dir);
+void seach_plugins(char *dir);
+extern char **array_dlls_path;
+extern int plugin_count;
 void argument_parser(int, char **);
 void string_search(const char *, char *);
 int validate_plugin(char *plugin_path);
