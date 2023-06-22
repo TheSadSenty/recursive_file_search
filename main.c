@@ -10,6 +10,7 @@
 int is_debug = 0;
 int main(int argc, char *argv[])
 {
+    int is_v_or_h = 0; // If -h or -v are passed, don't start the search.
     if (getenv("LAB1DEBUG") != NULL)
     {
         is_debug = 1;
@@ -18,17 +19,25 @@ int main(int argc, char *argv[])
     // First, search for the -P param.
     for (int i = 0; i < argc; i++)
     {
+        if ((strcmp(argv[i], "-h") == 0) || (strcmp(argv[i], "-v") == 0))
+        {
+            is_v_or_h = 1;
+            break;
+        }
         if (strcmp(argv[i], "-P") == 0)
         {
             sprintf(path_to_so_dir, "%s", argv[i + 1]);
         }
     }
     // Otherwise use the default path.
-    if (strcmp(path_to_so_dir, "") == 0)
+    if ((strcmp(path_to_so_dir, "") == 0) && (is_v_or_h == 0))
     {
         sprintf(path_to_so_dir, "./");
     }
-    seach_plugins_fill_struct(path_to_so_dir);
+    if (strcmp(path_to_so_dir, "") != 0)
+    {
+        seach_plugins_fill_struct(path_to_so_dir);
+    }
 
     // for getopt_long()
     if (plugins_options == NULL)
@@ -39,10 +48,10 @@ int main(int argc, char *argv[])
     {
         plugins_options = realloc(plugins_options, (option_count + 1) * sizeof(struct option));
     }
-    plugins_options[option_count].name = 0;
+    plugins_options[option_count].name = NULL;
     plugins_options[option_count].has_arg = 0;
     plugins_options[option_count].val = 0;
-    plugins_options[option_count].flag = 0;
+    plugins_options[option_count].flag = NULL;
 
     if (is_debug)
     {
@@ -56,6 +65,6 @@ int main(int argc, char *argv[])
         }
     }
 
-    // argument_parser(argc, argv);
+    argument_parser(argc, argv);
     return EXIT_SUCCESS;
 }

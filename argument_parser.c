@@ -6,63 +6,87 @@
 #include <getopt.h>
 
 #include "functions.h"
+#include "colors.h"
+int is_A = 0;
+int is_O = 0;
+int is_N = 0;
+size_t *actual_options_count;
 void argument_parser(int argc, char *argv[])
 {
-    static char *path_so;
-    if ((argc == 1) || ((strncmp(argv[1], "-h", sizeof("-h"))) == 0 && (argc == 2)))
+    actual_options_count = malloc(plugin_count * sizeof(size_t));
+    int option_index;
+    int rez;
+    while ((rez = getopt_long(argc, argv, "P:AONhv", plugins_options, &option_index)) != -1)
     {
-        /* Print help */
-        printf("Usage: %s -P /path/to/*.so [logical operators][plugins parameters]\n", argv[0]);
-        printf("Options:\n");
-        printf("-P\t\tPath to plugins, which implements plugin_api.h interface\n");
-        printf("-A\t\tLogical AND for plugin options\n");
-        printf("-O\t\tLogical OR for plugin options\n");
-        printf("-N\t\tLogical NOT for plugin options, after -A or -O options\n");
-        printf("-h, --help\tPrint help\n");
-        printf("-v, --version\tPrint version\n");
-        printf("Example:\n");
-        printf("%s -O -N --exe --file-len 1000 /tmp\tSearch any files except for executable with length==1000 bytes\n", argv[0]);
-        exit(EXIT_SUCCESS);
-    }
-    if ((argc == 2) && strncmp(argv[1], "-v", sizeof("-v")) == 0)
-    {
-        /* Print version */
-        printf("Kasyanov Maxim\nN32451\nVariant 13\n");
-        exit(EXIT_SUCCESS);
-    }
-    if (strncmp(argv[1], "-P", sizeof("-P")) == 0)
-    {
-        /* Start search for .so files in directory */
-        /* Get path to all .so in dir */
-        //path_so = seach_so(argv[2]);
-    }
-    else
-    {
-        /* Unrecognized options handler */
-        printf("%s: Unrecognized options\n", argv[0]);
-        exit(EXIT_FAILURE);
-    }
-    printf(".so: %s\n", path_so);
-    static struct option *detected_opt;   // struct for plugin_process_file()
-    static size_t *plugins_options_count; // array of detected options for each plugin
-    int plugin_count = 0;
-    int detected_option_count = 0;
+        switch (rez)
+        {
+        case 'h':
+            // Print help
+            printf("Usage: %s -P /path/to/*.so [logical operators][plugins parameters]\n", argv[0]);
+            printf("Options:\n");
+            printf("-P\t\tPath to plugins, which implements plugin_api.h interface\n");
+            printf("-A\t\tLogical AND for plugin options\n");
+            printf("-O\t\tLogical OR for plugin options\n");
+            printf("-N\t\tLogical NOT for plugin options, after -A or -O options\n");
+            printf("-h, --help\tPrint help\n");
+            printf("-v, --version\tPrint version\n");
+            printf("Example:\n");
+            printf("%s -O -N --exe --file-len 1000 /tmp\tSearch any files except for executable with length==1000 bytes\n", argv[0]);
+            exit(EXIT_SUCCESS);
+            break;
+        case 'v':
+            // Print version
+            printf("Kasyanov Maxim\nN32451\nVariant 13\n");
+            exit(EXIT_SUCCESS);
+        case 'P':
+            // do nothing
+            break;
+        case 'A':
+            is_A = 0;
+            is_O = 0;
+            break;
+        case 'O':
+            is_O = 1;
+            is_A = 0;
+            break;
+        case 'N':
+            if (is_A || is_O)
+            {
+                is_N = 0;
+            }
+            else
+            {
+                if (is_debug)
+                {
+                    fprintf(stderr, ANSI_COLOR_RED "-N requires the -A or -O option." ANSI_COLOR_RESET);
+                }
+                exit(EXIT_FAILURE);
+            }
+            break;
+        case '?':
+            exit(EXIT_FAILURE);
+            break;
+        default:
+            if (optarg != NULL)
+            {
+                // Fill the struct with values.
+                if (plugins_options[option_index].flag == NULL)
+                {
+                    plugins_options[option_index].flag = malloc(sizeof(optarg));
+                }
 
-    plugin_count = parse_plugins_parameters(argc, argv, path_so, &detected_opt, &plugins_options_count);
-
-    for (int i; i < plugin_count; i++)
-    {
-        detected_option_count=detected_option_count+plugins_options_count[i];
+                plugins_options[option_index].flag = (int *)optarg;
+            }
+            // Array of detected options for each plugin
+            actual_options_count[plugins_options[option_index].val] = actual_options_count[plugins_options[option_index].val] + 1;
+            break;
+        }
     }
-    printf("detected_option_count:%d\n", detected_option_count);
-    for (int i = 0; i < detected_option_count; i++)
+    if (is_debug)
     {
-        printf("struct:%s\n", detected_opt[i].name);
+        for (int i = 0; i < option_count; i++)
+        {
+            printf(ANSI_COLOR_CYAN "After getopt_long():\n\topt_name:%s\n\thas_arg:%d\n\topt_value:%s\n" ANSI_COLOR_RESET, plugins_options[i].name, plugins_options[i].has_arg, (char *)plugins_options[i].flag);
+        }
     }
-    for (int i = 0; i < plugin_count; i++)
-    {
-        printf("plugin_opt:%ld\n", plugins_options_count[i]);
-    }
-    free(plugins_options_count);
-    free(detected_opt);
 }
