@@ -67,5 +67,22 @@ int main(int argc, char *argv[])
 
     argument_parser(argc, argv);
     walk_dir_call_plugin(argv[argc - 1]);
-    return EXIT_SUCCESS;
+    if (plugins_options)
+    {
+        for (int i = 0; i < option_count; i++)
+        {
+            if (plugins_options[i].name)
+                free((char *)plugins_options[i].name);
+        }
+        free(plugins_options);
+    }
+    if (array_dlls_path)
+    {
+        for (int i = 0; i < plugin_count; i++)
+        {
+            if (array_dlls_path[i])
+                free(array_dlls_path[i]);
+        }
+        free(array_dlls_path);
+    }
 }

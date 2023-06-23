@@ -71,12 +71,6 @@ void argument_parser(int argc, char *argv[])
             {
                 if (optarg != NULL)
                 {
-                    // Fill the struct with values.
-                    if (plugins_options[option_index].flag == NULL)
-                    {
-                        plugins_options[option_index].flag = malloc(sizeof(optarg));
-                    }
-
                     plugins_options[option_index].flag = (int *)optarg;
                 }
                 // Array of the number of detected options for each plugin

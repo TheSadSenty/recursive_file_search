@@ -89,7 +89,6 @@ void walk_dir_call_plugin(char *dir)
 
                             sliced_opt[index].has_arg = plugins_options[opt].has_arg;
 
-                            sliced_opt[index].flag = malloc(sizeof(plugins_options[opt].flag));
                             sliced_opt[index].flag = plugins_options[opt].flag;
                             index = index + 1;
                         }
@@ -121,6 +120,12 @@ void walk_dir_call_plugin(char *dir)
                 END:
                     if (dl)
                         dlclose(dl);
+                    if (sliced_opt)
+                    {
+                        for (size_t j = 0; j < actual_options_count[plugin_index]; j++)
+                            free((char *)sliced_opt[j].name);
+                        free(sliced_opt);
+                    }
                 }
                 // processing results
                 int log_result = -1;
@@ -167,6 +172,8 @@ void walk_dir_call_plugin(char *dir)
                         fprintf(stderr, ANSI_COLOR_RED "All plugins failed to process file: %s\n" ANSI_COLOR_RESET, file_path);
                     }
                 }
+                if (result)
+                    free(result);
             }
 
             if (p->d_type == DT_DIR) // if it's a directory start run functhion again
