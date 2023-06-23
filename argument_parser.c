@@ -7,8 +7,7 @@
 
 #include "functions.h"
 #include "colors.h"
-int is_A = 0;
-int is_O = 0;
+int is_A = -1; // to detect if -A was passed
 int is_N = 0;
 size_t *actual_options_count;
 int *actual_detected_options;
@@ -45,17 +44,15 @@ void argument_parser(int argc, char *argv[])
             // do nothing
             break;
         case 'A':
-            is_A = 0;
-            is_O = 0;
+            is_A = 1;
             break;
         case 'O':
-            is_O = 1;
             is_A = 0;
             break;
         case 'N':
-            if (is_A || is_O)
+            if (is_A > -1)
             {
-                is_N = 0;
+                is_N = 1;
             }
             else
             {
