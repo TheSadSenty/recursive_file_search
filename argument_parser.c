@@ -11,16 +11,13 @@ int is_A = 0;
 int is_O = 0;
 int is_N = 0;
 size_t *actual_options_count;
+int *actual_detected_options;
 void argument_parser(int argc, char *argv[])
 {
-    actual_options_count = malloc(plugin_count * sizeof(size_t));
-    // init array with zeros
-    for (int i = 0; i < plugin_count; i++)
-    {
-        actual_options_count[i] = 0;
-    }
+    actual_options_count = calloc(plugin_count, sizeof(size_t)); // How many options were detected for each plugin
+    actual_detected_options = calloc(option_count, sizeof(int)); // Set 1 if options from plugins_options were passed
 
-    int option_index;
+    int option_index = -1;
     int rez;
     while ((rez = getopt_long(argc, argv, "P:AONhv", plugins_options, &option_index)) != -1)
     {
@@ -73,26 +70,33 @@ void argument_parser(int argc, char *argv[])
             exit(EXIT_FAILURE);
             break;
         default:
-            if (optarg != NULL)
+            if (option_index != -1) // Check for the short option. If getopt_long has short options, it doesn't update option_index.
             {
-                // Fill the struct with values.
-                if (plugins_options[option_index].flag == NULL)
+                if (optarg != NULL)
                 {
-                    plugins_options[option_index].flag = malloc(sizeof(optarg));
-                }
+                    // Fill the struct with values.
+                    if (plugins_options[option_index].flag == NULL)
+                    {
+                        plugins_options[option_index].flag = malloc(sizeof(optarg));
+                    }
 
-                plugins_options[option_index].flag = (int *)optarg;
+                    plugins_options[option_index].flag = (int *)optarg;
+                }
+                // Array of the number of detected options for each plugin
+                actual_options_count[plugins_options[option_index].val] = actual_options_count[plugins_options[option_index].val] + 1;
+
+                // Array of the presence of each option
+                actual_detected_options[option_index] = 1;
             }
-            // Array of detected options for each plugin
-            actual_options_count[plugins_options[option_index].val] = actual_options_count[plugins_options[option_index].val] + 1;
             break;
         }
+        option_index = -1;
     }
     if (is_debug)
     {
         for (int i = 0; i < option_count; i++)
         {
-            printf(ANSI_COLOR_CYAN "After getopt_long():\n\topt_name:%s\n\thas_arg:%d\n\topt_value:%s\n" ANSI_COLOR_RESET, plugins_options[i].name, plugins_options[i].has_arg, (char *)plugins_options[i].flag);
+            printf(ANSI_COLOR_CYAN "After getopt_long():\n\topt_name:%s\n\thas_arg:%d\n\topt_value:%s\n\tpresence:%d\n" ANSI_COLOR_RESET, plugins_options[i].name, plugins_options[i].has_arg, (char *)plugins_options[i].flag, actual_detected_options[i]);
         }
         for (int i = 0; i < plugin_count; i++)
         {
