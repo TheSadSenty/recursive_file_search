@@ -86,7 +86,7 @@ void walk_dir_call_plugin(char *dir)
                     for (int opt = 0; opt < option_count; opt++)
                     {
                         // Search for plugins opt where "val" field equals current plugin_index
-                        if (plugins_options[opt].val == plugin_index)
+                        if ((plugins_options[opt].val == plugin_index)&&(actual_detected_options[opt]==1))
                         {
                             sliced_opt[index].name = malloc(sizeof(plugins_options[opt].name));
                             sprintf((char *)sliced_opt[index].name, "%s", plugins_options[opt].name);
