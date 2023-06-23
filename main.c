@@ -66,5 +66,6 @@ int main(int argc, char *argv[])
     }
 
     argument_parser(argc, argv);
+    walk_dir_call_plugin(argv[argc - 1]);
     return EXIT_SUCCESS;
 }
