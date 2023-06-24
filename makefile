@@ -1,8 +1,8 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -g
 OUTPUT = lab1mksN32451.out
-.PHONY: clean,all,build, debug, tar, dll
-all: build
+.PHONY: clean,all,build, debug, tar, dll, dll_prod
+all: build dll_prod
 
 build: main.o seach_plugins_fill_struct.o argument_parser.o walk_dir_call_plugin.o
 	$(CC) $^ $(CFLAGS) -O3 -o $(OUTPUT)
@@ -28,6 +28,7 @@ tar:
 
 dll: img_search.c
 	$(CC) $(CFLAGS) -shared -fPIC -o libmksN32451.so img_search.c -ldl -lm
-
+dll_prod: dll
+	strip libmksN32451.so
 clean:
 	rm -rf *.o
