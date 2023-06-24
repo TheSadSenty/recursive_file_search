@@ -107,9 +107,9 @@ void walk_dir_call_plugin(char *dir)
                         if (is_debug)
                         {
                             fprintf(stderr, ANSI_COLOR_RED "Plugin %s failed to process file %s\n" ANSI_COLOR_RESET, array_dlls_path[plugin_index], file_path);
-                            result[plugin_index] = -1;
-                            goto END;
                         }
+                        result[plugin_index] = -1;
+                        goto END;
                     }
                     else
                     {
