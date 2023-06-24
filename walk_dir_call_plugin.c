@@ -163,8 +163,13 @@ void walk_dir_call_plugin(char *dir)
                 }
                 if (is_N)
                     log_result = !log_result;
-                if (log_result)
+                if (log_result == 0)
                     printf(ANSI_COLOR_GREEN "Found a file that satisfied all conditions: %s\n" ANSI_COLOR_RESET, file_path);
+                if (log_result == 1)
+                {
+                    if (is_debug)
+                        printf(ANSI_COLOR_RED "File %s doesn't satisfy conditions\n" ANSI_COLOR_RESET, file_path);
+                }
                 if (log_result == -1)
                 {
                     if (is_debug)
