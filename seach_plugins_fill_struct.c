@@ -74,7 +74,7 @@ void seach_plugins_fill_struct(char *dir)
                 }
                 // Check for plugin_get_info() func
                 void *func = dlsym(dl, "plugin_get_info");
-                if (!func && is_debug)
+                if (!func)
                 {
                     if (is_debug)
                         fprintf(stderr, ANSI_COLOR_RED "ERROR: dlsym() failed: %s\n" ANSI_COLOR_RESET, dlerror());
