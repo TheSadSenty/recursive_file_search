@@ -113,7 +113,15 @@ void walk_dir_call_plugin(char *dir)
                     }
                     else
                     {
-                        result[plugin_index] = ret;
+                        result[plugin_index] = !ret;
+                        /*
+                        We need to invert the result so logical operators can work properly.
+                        For example, if we got -A and plugins processed the file with results {1,0,1,0}.
+                        1 && 0 && 1 && 0 = 0 -> file satisfied all conditions.
+                        But it's wrong because 1 file doesn't match the query and 0 file does match the query.
+                        If we inverted the results, we would get the correct answer.
+                        0 && 1 && 0 && 1 = 0 -> file doesn't match the query
+                        */
                     }
                     if (is_debug)
                         printf(ANSI_COLOR_GREEN "plugin %s processed file %s with result %d\n" ANSI_COLOR_RESET, array_dlls_path[plugin_index], file_path, ret);
@@ -163,9 +171,9 @@ void walk_dir_call_plugin(char *dir)
                 }
                 if (is_N)
                     log_result = !log_result;
-                if (log_result == 0)
-                    printf(ANSI_COLOR_GREEN "Found a file that satisfied all conditions: %s\n" ANSI_COLOR_RESET, file_path);
                 if (log_result == 1)
+                    printf(ANSI_COLOR_GREEN "Found a file that satisfied all conditions: %s\n" ANSI_COLOR_RESET, file_path);
+                if (log_result == 0)
                 {
                     if (is_debug)
                         printf(ANSI_COLOR_RED "File %s doesn't satisfy conditions\n" ANSI_COLOR_RESET, file_path);
