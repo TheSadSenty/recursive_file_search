@@ -38,7 +38,11 @@ int main(int argc, char *argv[])
     {
         seach_plugins_fill_struct(path_to_so_dir);
     }
-
+    if (array_dlls_path == NULL)
+    {
+        printf("Zero plugins were found. Have a nice day.\n");
+        exit(EXIT_SUCCESS);
+    }
     // for getopt_long()
     if (plugins_options == NULL)
     {
