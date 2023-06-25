@@ -8,8 +8,8 @@
 #include "functions.h"
 #include "colors.h"
 
-char **array_dlls_path; // array of strings with dlls path
-int plugin_count;       // number of plugins
+char **array_dlls_path = NULL; // array of strings with dlls path
+int plugin_count;              // number of plugins
 struct option *plugins_options;
 int option_count = 0;
 /*
@@ -114,10 +114,10 @@ void seach_plugins_fill_struct(char *dir)
                 }
                 else
                 {
-                    array_dlls_path = realloc(array_dlls_path, (sizeof(char *) * plugin_count) + 1);
+                    array_dlls_path = realloc(array_dlls_path, sizeof(char *) * (plugin_count + 1));
                 }
-                array_dlls_path[plugin_count] = malloc(sizeof(file_path));
-                sprintf(array_dlls_path[plugin_count], "%s", file_path);
+                array_dlls_path[plugin_count] = malloc(strlen(file_path)+1);
+                strcpy(array_dlls_path[plugin_count], file_path);
 
                 for (size_t i = 0; i < pi.sup_opts_len; i++)
                 {
@@ -129,12 +129,12 @@ void seach_plugins_fill_struct(char *dir)
                     {
                         plugins_options = realloc(plugins_options, (option_count + 1) * sizeof(struct option));
                     }
-                    plugins_options[option_count].name = malloc(sizeof(pi.sup_opts[i].opt.name));
+                    plugins_options[option_count].name = malloc(strlen(pi.sup_opts[i].opt.name) + 1);
                     sprintf((char *)plugins_options[option_count].name, "%s", pi.sup_opts[i].opt.name);
 
                     plugins_options[option_count].has_arg = pi.sup_opts[i].opt.has_arg;
-                    
-                    plugins_options[option_count].flag = NULL; 
+
+                    plugins_options[option_count].flag = NULL;
                     // use an unused field to store the plugin number.
                     plugins_options[option_count].val = plugin_count;
 
