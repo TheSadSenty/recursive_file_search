@@ -1,7 +1,7 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -g
+CFLAGS = -Wall -Wextra -Werror -g -ldl
 OUTPUT = lab1mksN32451.out
-.PHONY: clean,all,build, debug, tar, dll, dll_prod
+.PHONY: clean,all,build, debug, tar, dll, dll_prod, libs
 all: build dll_prod
 
 build: main.o seach_plugins_fill_struct.o argument_parser.o walk_dir_call_plugin.o
@@ -26,9 +26,11 @@ walk_dir_call_plugin.o: walk_dir_call_plugin.c
 tar:
 	tar --create --file archive.tar *.c *.txt *.h makefile
 
-dll: img_search.c
-	$(CC) $(CFLAGS) -shared -fPIC -o libmksN32451.so img_search.c -ldl -lm
+dll: img_search.c libs
+	$(CC) $(CFLAGS) -shared -fPIC -lm -o ./libs/libmksN32451.so img_search.c 
 dll_prod: dll
 	strip libmksN32451.so
 clean:
 	rm -rf *.o
+libs:
+	@mkdir -p libs
