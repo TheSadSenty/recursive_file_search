@@ -67,6 +67,7 @@ int main(int argc, char *argv[])
 
     argument_parser(argc, argv);
     walk_dir_call_plugin(argv[argc - 1]);
+    // Freeing memory
     if (plugins_options)
     {
         for (int i = 0; i < option_count; i++)
@@ -84,5 +85,13 @@ int main(int argc, char *argv[])
                 free(array_dlls_path[i]);
         }
         free(array_dlls_path);
+    }
+    if (actual_detected_options)
+    {
+        free(actual_detected_options);
+    }
+    if (actual_options_count)
+    {
+        free(actual_options_count);
     }
 }
