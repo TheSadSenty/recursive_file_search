@@ -46,18 +46,19 @@ int plugin_process_file(const char *fname,
 
     if (!fname || !in_opts || !in_opts_len)
     {
-        fprintf(stderr, ANSI_COLOR_RED DEBUG_PREFIX "%s\n" ANSI_COLOR_RESET, strerror(EINVAL));
+        if (DEBUG)
+            fprintf(stderr, ANSI_COLOR_RED DEBUG_PREFIX "%s\n" ANSI_COLOR_RESET, strerror(EINVAL));
         return -1;
     }
     // Check for the presence of options
     for (size_t i = 0; i < in_opts_len; i++)
     {
-        /*         if ((in_opts[i].name == NULL) || (in_opts[i].flag == NULL))
-                {
-                    if (DEBUG)
-                        fprintf(stderr, ANSI_COLOR_RED DEBUG_PREFIX "Got empty structure fileds\n" ANSI_COLOR_RESET);
-                    return -1;
-                } */
+        if ((in_opts[i].name == NULL) || (in_opts[i].flag == NULL))
+        {
+            if (DEBUG)
+                fprintf(stderr, ANSI_COLOR_RED DEBUG_PREFIX "Got empty structure fileds\n" ANSI_COLOR_RESET);
+            return -1;
+        }
         if (DEBUG)
         {
             fprintf(stderr, ANSI_COLOR_YELLOW DEBUG_PREFIX "Got option %s with value %s\n" ANSI_COLOR_RESET, in_opts[i].name, (char *)in_opts[i].flag);
@@ -68,42 +69,37 @@ int plugin_process_file(const char *fname,
         fprintf(stderr, ANSI_COLOR_RED DEBUG_PREFIX "Plugin expecting 1 option Got %ld instead" ANSI_COLOR_RESET, in_opts_len);
         return -1;
     }
-    char *token;
-    char *rest = (char *)malloc(sizeof(in_opts[0].flag)); // need to do it to not change the original structure.
-    sprintf(rest, "%s", (char *)in_opts[0].flag);
-    while ((token = __strtok_r(rest, ",", &rest)))
+
+    if (strstr((char *)in_opts[0].flag, "png") != NULL)
+    {
+        file_formats[0] = 1;
+    }
+    if (strstr((char *)in_opts[0].flag, "bmp") != NULL)
+    {
+        file_formats[1] = 1;
+    }
+    if (strstr((char *)in_opts[0].flag, "jpg") != NULL)
+    {
+        file_formats[2] = 1;
+    }
+    if (strstr((char *)in_opts[0].flag, "gif") != NULL)
+    {
+        file_formats[3] = 1;
+    }
+    size_t parsed_file_formats = 0;
+    for (int i = 0; i < 4; i++)
+    {
+        if (file_formats[i])
+            parsed_file_formats = parsed_file_formats + 3 + 1; // All file formats length is 3+comma.
+    }
+    parsed_file_formats = parsed_file_formats - 1; // exclude the last comma
+    if (parsed_file_formats != strlen((char *)in_opts[0].flag))
     {
         if (DEBUG)
-        {
-            printf(ANSI_COLOR_CYAN DEBUG_PREFIX "Going to search for %s image format\n" ANSI_COLOR_RESET, token);
-        }
-        // Too lazy to write something more complex ¯\_(ツ)_/¯
-        if (strcmp(token, "png") == 0)
-        {
-            file_formats[0] = 1;
-            continue;
-        }
-        if (strcmp(token, "bmp") == 0)
-        {
-            file_formats[1] = 1;
-            continue;
-        }
-        if (strcmp(token, "jpg") == 0)
-        {
-            file_formats[2] = 1;
-            continue;
-        }
-        if (strcmp(token, "gif") == 0)
-        {
-            file_formats[3] = 1;
-            continue;
-        }
-        else
-        {
-            fprintf(stderr, ANSI_COLOR_RED DEBUG_PREFIX "Got an unknown file format:%s\n" ANSI_COLOR_RESET, token);
-            return -1;
-        }
+            fprintf(stderr, ANSI_COLOR_RED DEBUG_PREFIX "Got an unexpected sequence of file formats:%s\n" ANSI_COLOR_RESET, (char *)in_opts[0].flag);
+        return -1;
     }
+
     FILE *fp;
     fp = fopen(fname, "rb");
     if (fp == NULL)
