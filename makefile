@@ -29,7 +29,7 @@ tar:
 dll: img_search.c libs
 	$(CC) $(CFLAGS) -shared -fPIC -lm -o ./libs/libmksN32451.so img_search.c 
 dll_prod: dll
-	strip libmksN32451.so
+	strip ./libs/libmksN32451.so
 clean:
 	rm -rf *.o
 libs:
