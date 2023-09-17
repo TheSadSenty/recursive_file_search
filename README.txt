@@ -9,3 +9,5 @@ make tar - archive *.c, *.txt, *.h and makefile
 Usage: ./labmksN32451.out <dir> <string>
 <dir> - directory to search
 <string> - string to search
+---
+Launch with debug output: export LAB1DEBUG=1
