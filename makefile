@@ -1,11 +1,12 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -g
 OUTPUT = labmksN32451.out
 .PHONY: clean,all,build, debug, tar
 all: build
 
 build: main.o string_search.o walk_dir_impl.o argument_parser.o
 	$(CC) $^ -O3 -o $(OUTPUT)
+	strip $(OUTPUT)
 
 debug: main.o string_search.o walk_dir_impl.o argument_parser.o
 	$(CC) $^ -O0 -g -o $(OUTPUT)
